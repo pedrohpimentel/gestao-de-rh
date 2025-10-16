@@ -1,0 +1,57 @@
+# Arquivos de Build e Artefatos (Maven)
+#####################################
+target/
+target-idea/ # Diretório de build do IntelliJ
+target-eclipse/
+
+# Arquivos de Pacote
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Arquivos de Classes
+#####################################
+*.class
+*.ser
+*.lock
+
+# Arquivos de IDE (Ignorar para portabilidade)
+#####################################
+# IntelliJ
+/.idea/
+out/
+*.iml
+*.iws
+*.ipr
+
+# Eclipse
+.metadata
+.classpath
+.project
+.settings/
+/bin/
+
+# VS Code (Recomendado)
+.vscode/
+
+# Arquivos de Log e Temporários
+#####################################
+*.log
+/logs/
+temp/
+tmp/
+hs_err_pid* # Logs de crash da JVM
+
+# Dados Sensíveis/Ambiente Local
+#####################################
+# Arquivos de configuração específicos de ambiente (se existirem)
+# Ex: Arquivos de perfil local que não devem ser compartilhados
+# application-local.yml
+# application-dev.properties
+
+# Chaves SSH (Como você mencionou, mas geralmente estão fora da pasta do projeto)
+*.pem
+*.ppk
