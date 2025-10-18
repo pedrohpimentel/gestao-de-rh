@@ -65,6 +65,15 @@ public class SolicitacaoFeriasService {
     }
 
     /*
+     * Lista todas as solicitações de férias com status PENDENTE, ordenadas pela data de início.
+     * @return Uma lista de solicitações pendentes.
+     */
+    public List<SolicitacaoFerias> listarSolicitacoesPendentes(){
+        // Usa a Query Method customizada que ordena pela data de início
+        return solicitacaoFeriasRepository.findByStatusOrderByDataInicioAsc(StatusFerias.PENDENTE);
+    }
+
+    /*
      * Atualiza o status de uma solicitação de férias.
      * @param id O ID da solicitação.
      * @param novoStatus O novo status (APROVADA ou REJEITADA).

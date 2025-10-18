@@ -53,6 +53,18 @@ public class SolicitacaoFeriasController {
     }
 
     /*
+     * GET /solicitacoes/pendentes
+     * Endpoint de gerência para listar apenas as solicitações com status PENDENTE.
+     *
+     * @return 200 OK e a lista de solicitações pendentes.
+     */
+    @GetMapping("/pendentes")
+    public ResponseEntity<List<SolicitacaoFerias>> listarSolicitacoesPendentes(){
+        List<SolicitacaoFerias> solicitacoes = solicitacaoFeriasService.listarSolicitacoesPendentes();
+        return ResponseEntity.ok(solicitacoes);
+    }
+
+    /*
      * GET /solicitacoes/{id}
      * Busca uma solicitação específica.
      *
@@ -82,5 +94,4 @@ public class SolicitacaoFeriasController {
         SolicitacaoFerias solicitacaoAtualizada = solicitacaoFeriasService.atualizarStatus(id,novoStatus);
         return ResponseEntity.ok(solicitacaoAtualizada);
     }
-
 }
