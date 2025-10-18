@@ -6,7 +6,5 @@ package com.pedro.gestao_de_rh.hrms.enums;
 public enum TipoRegistro {
 
     ENTRADA,
-    SAIDA_ALMOCO,
-    RETORNO_ALMOCO,
     SAIDA
 }
