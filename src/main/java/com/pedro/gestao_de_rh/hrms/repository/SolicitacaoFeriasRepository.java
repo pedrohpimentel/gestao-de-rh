@@ -10,4 +10,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SolicitacaoFeriasRepository extends JpaRepository<SolicitacaoFerias, Long> {
     // Queries customizadas serão adicionadas aqui conforme necessário.
+
 }

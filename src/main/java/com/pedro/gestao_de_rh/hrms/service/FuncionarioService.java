@@ -27,7 +27,7 @@ public class FuncionarioService {
 
     //Busca o funcionário por ID, se não encontrar irá estourar a exceção RecursoNaoEncontradoException.
     public Funcionario buscarFuncionarioPorId(Long id){
-        repository.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException("Funcionário com ID: " + id + " não encontrado!"));
+        repository.findById(id).orElseThrow(() -> new RecursoNaoEncontradoException("Funcionário com ID: " + id + " não encontrado!", id));
         return buscarFuncionarioPorId(id);
     }
 
