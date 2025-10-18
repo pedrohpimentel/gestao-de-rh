@@ -3,7 +3,7 @@ spring:
     name: gestao-de-rh
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/gestao-de-rh?useTimezone=true&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/gestao-de-rh?useTimezone=true&serverTimezone=UTC&createDatabaseIfNotExist=true
     username: root
     password: 1234567
   jpa:
