@@ -1,32 +1,59 @@
 package com.pedro.gestao_de_rh.hrms.controller;
 
-import com.pedro.gestao_de_rh.hrms.model.RegistroDePonto;
-import com.pedro.gestao_de_rh.hrms.service.RegistroDePontoService;
+import com.pedro.gestao_de_rh.hrms.dto.funcionario.RegistroDePontoRequestDTO;
+import com.pedro.gestao_de_rh.hrms.dto.funcionario.RegistroDePontoResponseDTO;
+import com.pedro.gestao_de_rh.hrms.service.RegistroDePontoService; // Importação corrigida
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+/**
+ * Controller responsável pelos endpoints da gestão de Registro de Ponto.
+ * Refatorado para usar DTOs.
+ */
+@RestController
+@RequestMapping("/api/v1/pontos")
+@RequiredArgsConstructor
 public class RegistroDePontoController {
 
-    private RegistroDePontoService registroDePontoService;
+    private final RegistroDePontoService registroDePontoService; // Variável corrigida
 
     /*
-     Endpoint para o funcionário bater o ponto.
-     * Recebe o ID do funcionário como Path Variable.
-     * A validação de existência do funcionário é feita dentro do Service.
+     * POST /pontos
+     * Registra um novo ponto.
+     * @param requestDTO Dados do ponto a ser registrado.
+     * @return 201 Created e o ponto registrado (ResponseDTO).
      */
+    @PostMapping
+    public ResponseEntity<RegistroDePontoResponseDTO> registrarPonto(@RequestBody RegistroDePontoRequestDTO requestDTO) {
+        RegistroDePontoResponseDTO responseDTO = registroDePontoService.registrarPonto(requestDTO);
+        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+    }
 
-    @PostMapping("/bater/{funcionarioId}")
-    public ResponseEntity<RegistroDePonto> baterPonto (@PathVariable Long funcionarioId){
+    /*
+     * GET /pontos/{id}
+     * Busca um registro de ponto pelo ID.
+     * @param id ID do ponto.
+     * @return 200 OK e o ponto encontrado (ResponseDTO).
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<RegistroDePontoResponseDTO> buscarPontoPorId(@PathVariable Long id) {
+        RegistroDePontoResponseDTO responseDTO = registroDePontoService.buscarPontoPorId(id);
+        return ResponseEntity.ok(responseDTO);
+    }
 
-        // Chama o Service, que contém toda a lógica:
-        // 1. Verificar se o funcionário existe
-        // 2. Determinar se é ENTRADA ou SAÍDA
-        // 3. Salvar o registro
-
-        RegistroDePonto novoRegistro = registroDePontoService.registrarPonto(funcionarioId);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(novoRegistro);
+    /*
+     * GET /pontos/funcionario/{funcionarioId}
+     * Lista todos os pontos de um funcionário.
+     * @param funcionarioId ID do funcionário.
+     * @return 200 OK e a lista de pontos (ResponseDTO).
+     */
+    @GetMapping("/funcionario/{funcionarioId}")
+    public ResponseEntity<List<RegistroDePontoResponseDTO>> listarPontosPorFuncionario(@PathVariable Long funcionarioId) {
+        List<RegistroDePontoResponseDTO> responseDTOs = registroDePontoService.listarPontosPorFuncionario(funcionarioId);
+        return ResponseEntity.ok(responseDTOs);
     }
 }

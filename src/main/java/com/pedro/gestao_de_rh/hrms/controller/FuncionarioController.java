@@ -1,7 +1,7 @@
 package com.pedro.gestao_de_rh.hrms.controller;
 
-
-import com.pedro.gestao_de_rh.hrms.model.Funcionario;
+import com.pedro.gestao_de_rh.hrms.dto.funcionario.FuncionarioRequestDTO;
+import com.pedro.gestao_de_rh.hrms.dto.funcionario.FuncionarioResponseDTO;
 import com.pedro.gestao_de_rh.hrms.service.FuncionarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -10,51 +10,77 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/*
+ * Controller responsável pelos endpoints da gestão de Funcionários.
+ * Refatorado para usar DTOs.
+ */
 @RestController
-@RequestMapping("/funcionario")
+@RequestMapping("/api/v1/funcionarios")
 @RequiredArgsConstructor
 public class FuncionarioController {
 
-
     private final FuncionarioService funcionarioService;
 
-    // POST: Cria um novo funcionário. Retorna 201 Created e a entidade com o ID.
+    /*
+     * POST /funcionarios
+     * Cria um novo funcionário.
+     * @param requestDTO Dados do novo funcionário.
+     * @return 201 Created e o funcionário criado (ResponseDTO).
+     */
     @PostMapping
-    ResponseEntity<Funcionario> salvarFuncionario(@RequestBody Funcionario funcionario){
-        Funcionario novoFuncionario = funcionarioService.salvarFuncionario(funcionario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(novoFuncionario);
+    public ResponseEntity<FuncionarioResponseDTO> criarFuncionario(@RequestBody FuncionarioRequestDTO requestDTO) {
+        FuncionarioResponseDTO responseDTO = funcionarioService.criarFuncionario(requestDTO);
+        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
-    // GET: Lista todos os funcionários.
+    /*
+     * GET /funcionarios
+     * Lista todos os funcionários.
+     * @return 200 OK e a lista de funcionários (ResponseDTO).
+     */
     @GetMapping
-    public ResponseEntity<List<Funcionario>> listaFuncionarios(){
-        List<Funcionario> funcionarios = funcionarioService.listaDeFuncionarios();
-        return ResponseEntity.ok(funcionarios);
+    public ResponseEntity<List<FuncionarioResponseDTO>> listarTodos() {
+        List<FuncionarioResponseDTO> responseDTOs = funcionarioService.listarTodos();
+        return ResponseEntity.ok(responseDTOs);
     }
 
-    // GET: Busca funcionário por ID. O ID é uma variável do path.
+    /*
+     * GET /funcionarios/{id}
+     * Busca um funcionário pelo ID.
+     * @param id ID do funcionário.
+     * @return 200 OK e o funcionário encontrado (ResponseDTO).
+     */
     @GetMapping("/{id}")
-    public ResponseEntity<Funcionario> buscarFuncionarioPorId (@PathVariable Long id){
-        Funcionario funcionario = funcionarioService.buscarFuncionarioPorId(id);
-        return ResponseEntity.ok(funcionario);// Retorna 200 OK
-        // Se não encontrar, o Service deve lançar uma exceção que resulta em 404
+    public ResponseEntity<FuncionarioResponseDTO> buscarFuncionarioPorId(@PathVariable Long id) {
+        FuncionarioResponseDTO responseDTO = funcionarioService.buscarFuncionarioPorIdDTO(id);
+        return ResponseEntity.ok(responseDTO);
     }
 
-
-    // PUT: Atualiza um funcionário por ID. O ID é uma variável do path.
-    // Retornamos a entidade atualizada para o cliente (200 OK).
+    /*
+     * PUT /funcionarios/{id}
+     * Atualiza os dados de um funcionário existente.
+     * @param id ID do funcionário a ser atualizado.
+     * @param requestDTO Dados atualizados.
+     * @return 200 OK e o funcionário atualizado (ResponseDTO).
+     */
     @PutMapping("/{id}")
-   public ResponseEntity<Funcionario> atualizarFuncionarioPorId (@PathVariable Long id,
-            @RequestBody Funcionario funcionario){
-        Funcionario funcionarioAtualizado = funcionarioService.atualizarFuncionarioPorId(id, funcionario);
-        return ResponseEntity.ok(funcionarioAtualizado);
+    public ResponseEntity<FuncionarioResponseDTO> atualizarFuncionario(
+            @PathVariable Long id,
+            @RequestBody FuncionarioRequestDTO requestDTO) {
+
+        FuncionarioResponseDTO responseDTO = funcionarioService.atualizarFuncionario(id, requestDTO);
+        return ResponseEntity.ok(responseDTO);
     }
 
-    // DELETE: Deleta um funcionário por ID. Retorna 204 No Content.
+    /*
+     * DELETE /funcionarios/{id}
+     * Deleta um funcionário pelo ID.
+     * @param id ID do funcionário a ser deletado.
+     * @return 204 No Content.
+     */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarFuncionarioPorId(@PathVariable Long id){
-        funcionarioService.deletarFuncionarioPorId(id);
-        return ResponseEntity.noContent().build();// Retorna 204 No Content
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletarFuncionario(@PathVariable Long id) {
+        funcionarioService.deletarFuncionario(id);
     }
-
 }

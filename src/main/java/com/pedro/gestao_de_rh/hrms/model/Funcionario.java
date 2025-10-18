@@ -3,12 +3,15 @@ package com.pedro.gestao_de_rh.hrms.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
 @Entity
 @Table(name = "funcionario")
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Funcionario {
 
     @Id
