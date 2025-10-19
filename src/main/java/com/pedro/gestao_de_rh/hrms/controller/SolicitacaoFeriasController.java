@@ -17,7 +17,7 @@ import java.util.List;
  * Mapeamento base: /api/v1/solicitacoes
  */
 @RestController
-@RequestMapping("/api/v1/solicitacoes")
+@RequestMapping("/ferias")
 @RequiredArgsConstructor
 public class SolicitacaoFeriasController {
 
@@ -87,7 +87,7 @@ public class SolicitacaoFeriasController {
      * @param novoStatus O corpo da requisição contendo o novo StatusFerias.
      * @return 200 OK e a solicitação atualizada.
      */
-    @PutMapping("/{id/status}")
+    @PutMapping("/status/{id}")
     public ResponseEntity<SolicitacaoFerias> atualizarStatus(
             @PathVariable Long id,
            @Valid @RequestBody StatusFerias novoStatus) { //O Spring converte o valor de body para enum

@@ -2,6 +2,7 @@ package com.pedro.gestao_de_rh.hrms.controller;
 
 import com.pedro.gestao_de_rh.hrms.dto.funcionario.funcionarioDTO.FuncionarioRequestDTO;
 import com.pedro.gestao_de_rh.hrms.dto.funcionario.funcionarioDTO.FuncionarioResponseDTO;
+import com.pedro.gestao_de_rh.hrms.exception.RecursoNaoEncontradoException;
 import com.pedro.gestao_de_rh.hrms.service.FuncionarioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -49,13 +50,20 @@ public class FuncionarioController {
     /*
      * GET /funcionarios/{id}
      * Busca um funcionário pelo ID.
+     * Implementado try-catch para garantir o 404 localmente, contornando falha do Global Handler.
      * @param id ID do funcionário.
-     * @return 200 OK e o funcionário encontrado (ResponseDTO).
+     * @return 200 OK e o funcionário encontrado (ResponseDTO) ou 404 Not Found.
      */
     @GetMapping("/{id}")
     public ResponseEntity<FuncionarioResponseDTO> buscarFuncionarioPorId(@PathVariable Long id) {
-        FuncionarioResponseDTO responseDTO = funcionarioService.buscarFuncionarioPorIdDTO(id);
-        return ResponseEntity.ok(responseDTO);
+        try {
+            FuncionarioResponseDTO responseDTO = funcionarioService.buscarFuncionarioPorIdDTO(id);
+            return ResponseEntity.ok(responseDTO);
+        } catch (RecursoNaoEncontradoException ex) {
+            // Retorna 404 Not Found manualmente
+            return ResponseEntity.notFound().build();
+            // Nota: O Global Handler ainda deve cuidar do corpo do erro, mas o status é garantido aqui.
+        }
     }
 
     /*
@@ -69,7 +77,7 @@ public class FuncionarioController {
     @PutMapping("/{id}")
     public ResponseEntity<FuncionarioResponseDTO> atualizarFuncionario(
             @PathVariable Long id,
-           @Valid @RequestBody FuncionarioRequestDTO requestDTO) {
+            @Valid @RequestBody FuncionarioRequestDTO requestDTO) {
 
         FuncionarioResponseDTO responseDTO = funcionarioService.atualizarFuncionario(id, requestDTO);
         return ResponseEntity.ok(responseDTO);

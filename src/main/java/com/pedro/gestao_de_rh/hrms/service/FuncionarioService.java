@@ -110,6 +110,4 @@ public class FuncionarioService {
         buscarFuncionarioPorId(id);
         funcionarioRepository.deleteById(id);
     }
-
-
 }

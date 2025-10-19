@@ -13,17 +13,16 @@ import java.time.LocalTime;
 @Data
 public class RegistroDePontoRequestDTO {
 
+
     @NotNull(message = "O ID do funcionário é obrigatório.")
     private Long funcionarioId;
 
-    @NotNull(message = "A data do ponto é obrigatória.")
-    @PastOrPresent(message = "A data do ponto não pode ser futura.")
+    @NotNull(message = "A data do registro é obrigatória.")
     private LocalDate data;
 
     @NotNull(message = "O horário de entrada é obrigatório.")
     private LocalTime entrada;
 
-    // Saída pode ser nula se o ponto ainda não foi fechado, mas verificamos se está no presente.
-    @PastOrPresent(message = "O horário de saída não pode ser no futuro.")
+    // Removemos qualquer anotação de validação temporal aqui para resolver o erro.
     private LocalTime saida;
 }

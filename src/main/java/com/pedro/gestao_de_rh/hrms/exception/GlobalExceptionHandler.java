@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  * Classe que centraliza o tratamento de exceções globalmente na API.
  * Anotada com @RestControllerAdvice para capturar exceções de todos os Controllers.
  */
-@RestControllerAdvice
+@RestControllerAdvice // Garante que este handler se aplique a todos os @Controllers
 public class GlobalExceptionHandler {
 
     /*

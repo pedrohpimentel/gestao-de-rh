@@ -21,7 +21,7 @@ public class Funcionario {
     @Column(nullable = false)
     private String nome;
 
-    @Column(unique = true,nullable = false)
+    @Column(nullable = false, unique = true, updatable = false)
     private String cpf;
 
     @Column(nullable = false)

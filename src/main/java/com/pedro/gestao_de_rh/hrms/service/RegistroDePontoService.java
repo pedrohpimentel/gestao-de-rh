@@ -4,6 +4,7 @@ import com.pedro.gestao_de_rh.hrms.dto.funcionario.RegistroDePontoDTO.RegistroDe
 import com.pedro.gestao_de_rh.hrms.dto.funcionario.RegistroDePontoDTO.RegistroDePontoResponseDTO;
 import com.pedro.gestao_de_rh.hrms.dto.ponto.TotalHorasTrabalhadasDTO;
 import com.pedro.gestao_de_rh.hrms.exception.RecursoNaoEncontradoException;
+import com.pedro.gestao_de_rh.hrms.exception.RegraNegocioException; // IMPORTANTE: Nova Exceção
 import com.pedro.gestao_de_rh.hrms.model.Funcionario;
 import com.pedro.gestao_de_rh.hrms.model.RegistroDePonto;
 import com.pedro.gestao_de_rh.hrms.repository.FuncionarioRepository;
@@ -55,14 +56,22 @@ public class RegistroDePontoService {
         Funcionario funcionario = funcionarioRepository.findById(requestDTO.getFuncionarioId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Funcionario", requestDTO.getFuncionarioId()));
 
-        // 2. Converte DTO para Entidade
+        // 2. ADICIONA VALIDAÇÃO DA REGRA DE NEGÓCIO: Saída deve ser após a Entrada
+        if (requestDTO.getEntrada() != null && requestDTO.getSaida() != null) {
+            if (requestDTO.getSaida().isBefore(requestDTO.getEntrada())) {
+                throw new RegraNegocioException("O horário de saída não pode ser anterior ao horário de entrada.");
+            }
+        }
+
+        // 3. Converte DTO para Entidade
         RegistroDePonto novoRegistro = new RegistroDePonto();
         novoRegistro.setFuncionario(funcionario);
         novoRegistro.setData(requestDTO.getData());
         novoRegistro.setEntrada(requestDTO.getEntrada());
+
         novoRegistro.setSaida(requestDTO.getSaida()); // Pode ser null
 
-        // 3. Salva e retorna o DTO de resposta
+        // 4. Salva e retorna o DTO de resposta
         RegistroDePonto salvo = registroDePontoRepository.save(novoRegistro);
         return toResponseDTO(salvo);
     }
