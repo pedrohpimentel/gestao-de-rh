@@ -14,6 +14,8 @@ import java.time.LocalTime;
 @Builder
 public class RegistroDePontoResponseDTO {
     private Long id;
+    private Long funcionarioId;
+    private String nomeFuncionario;
     private LocalDate data;
     private LocalTime entrada;
     private LocalTime saida;

@@ -1,92 +1,155 @@
 package com.pedro.gestao_de_rh.hrms.service;
 
-import com.pedro.gestao_de_rh.hrms.dto.funcionario.FuncionarioResponseDTO;
 import com.pedro.gestao_de_rh.hrms.dto.funcionario.RegistroDePontoRequestDTO;
 import com.pedro.gestao_de_rh.hrms.dto.funcionario.RegistroDePontoResponseDTO;
+import com.pedro.gestao_de_rh.hrms.dto.ponto.TotalHorasTrabalhadasDTO;
 import com.pedro.gestao_de_rh.hrms.exception.RecursoNaoEncontradoException;
 import com.pedro.gestao_de_rh.hrms.model.Funcionario;
-import com.pedro.gestao_de_rh.hrms.model.RegistroDePonto; // Nome da Entidade Corrigido
-import com.pedro.gestao_de_rh.hrms.repository.RegistroDePontoRepository; // Nome do Repository Corrigido
-import lombok.RequiredArgsConstructor;
+import com.pedro.gestao_de_rh.hrms.model.RegistroDePonto;
+import com.pedro.gestao_de_rh.hrms.repository.FuncionarioRepository;
+import com.pedro.gestao_de_rh.hrms.repository.RegistroDePontoRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Camada de serviço responsável pela lógica de negócio do Registro de Ponto.
- * Refatorada para utilizar DTOs na comunicação com o Controller.
+/*
+ * Serviço responsável pela lógica de negócio do Registro de Ponto.
  */
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class RegistroDePontoService {
 
-    private final RegistroDePontoRepository registroDePontoRepository; // Variável corrigida
-    private final FuncionarioService funcionarioService;
-
-    // --- MÉTODOS DE CONVERSÃO INTERNOS ---
-
-    /**
-     * Converte RegistroDePontoRequestDTO para a Entidade RegistroDePonto.
-     */
-    private RegistroDePonto toEntity(RegistroDePontoRequestDTO dto) {
-        // Busca a Entidade Funcionario (lança 404 se não existir)
-        Funcionario funcionario = funcionarioService.buscarFuncionarioPorId(dto.getFuncionarioId());
-
-        RegistroDePonto ponto = new RegistroDePonto(); // Instância corrigida
-        ponto.setFuncionario(funcionario);
-        ponto.setData(dto.getData());
-        ponto.setEntrada(dto.getEntrada());
-        ponto.setSaida(dto.getSaida());
-        return ponto;
-    }
+    private final RegistroDePontoRepository registroDePontoRepository;
+    private final FuncionarioRepository funcionarioRepository;
+    private final FuncionarioService funcionarioService; // Usado para buscar o Funcionário
 
     /*
-     * Converte a Entidade RegistroDePonto para RegistroDePontoResponseDTO.
+     * Converte uma Entidade RegistroDePonto para um DTO de Resposta.
+     * @param registro Entidade do Banco de Dados.
+     * @return DTO formatado para a API.
      */
-    private RegistroDePontoResponseDTO toResponseDTO(RegistroDePonto ponto) { // Parâmetro corrigido
-        // Usa o método DTO do FuncionarioService para evitar duplicação de conversão
-        FuncionarioResponseDTO funcionarioDTO = funcionarioService.buscarFuncionarioPorIdDTO(ponto.getFuncionario().getId());
-
-        return RegistroDePontoResponseDTO.builder() // Builder corrigido
-                .id(ponto.getId())
-                .data(ponto.getData())
-                .entrada(ponto.getEntrada())
-                .saida(ponto.getSaida())
-                .funcionario(funcionarioDTO)
+    private RegistroDePontoResponseDTO toResponseDTO(RegistroDePonto registro) {
+        return RegistroDePontoResponseDTO.builder()
+                .id(registro.getId())
+                .funcionarioId(registro.getFuncionario().getId())
+                .nomeFuncionario(registro.getFuncionario().getNome())
+                .data(registro.getData())
+                .entrada(registro.getEntrada())
+                .saida(registro.getSaida())
                 .build();
     }
 
-    // --- MÉTODOS DE SERVIÇO REFATORADOS ---
-
     /*
-     * Registra um novo ponto a partir do Request DTO.
+     * Cria um novo registro de ponto no banco de dados.
+     * @param requestDTO DTO de requisição com os dados do ponto.
+     * @return DTO de resposta do registro criado.
      */
-    public RegistroDePontoResponseDTO registrarPonto(RegistroDePontoRequestDTO requestDTO) {
-        RegistroDePonto ponto = toEntity(requestDTO); // Variável corrigida
-        RegistroDePonto salvo = registroDePontoRepository.save(ponto); // Variável corrigida
+    public RegistroDePontoResponseDTO criarRegistro(RegistroDePontoRequestDTO requestDTO) {
+        // 1. Verificar se o funcionário existe
+        Funcionario funcionario = funcionarioRepository.findById(requestDTO.getFuncionarioId())
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Funcionario", requestDTO.getFuncionarioId()));
+
+        // 2. Converte DTO para Entidade
+        RegistroDePonto novoRegistro = new RegistroDePonto();
+        novoRegistro.setFuncionario(funcionario);
+        novoRegistro.setData(requestDTO.getData());
+        novoRegistro.setEntrada(requestDTO.getEntrada());
+        novoRegistro.setSaida(requestDTO.getSaida()); // Pode ser null
+
+        // 3. Salva e retorna o DTO de resposta
+        RegistroDePonto salvo = registroDePontoRepository.save(novoRegistro);
         return toResponseDTO(salvo);
     }
 
     /*
-     * Busca um ponto pelo ID e retorna o Response DTO.
+     * Busca todos os registros de ponto.
+     * @return Lista de DTOs de resposta.
      */
-    public RegistroDePontoResponseDTO buscarPontoPorId(Long id) {
-        RegistroDePonto ponto = registroDePontoRepository.findById(id) // Variável corrigida
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Registro de Ponto", id)); // Mensagem corrigida
-        return toResponseDTO(ponto);
+    public List<RegistroDePontoResponseDTO> buscarTodos() {
+        return registroDePontoRepository.findAll().stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
     }
 
     /*
-     * Lista todos os pontos de um funcionário específico, retornando uma lista de Response DTOs.
-     * Garante que o funcionário exista antes de buscar os pontos.
+     * Busca um registro de ponto por ID.
+     * @param id ID do registro.
+     * @return DTO de resposta.
      */
-    public List<RegistroDePontoResponseDTO> listarPontosPorFuncionario(Long funcionarioId) {
-        // Garante a existência do funcionário (lança 404 se não existir)
-        Funcionario funcionario = funcionarioService.buscarFuncionarioPorId(funcionarioId);
+    public RegistroDePontoResponseDTO buscarPorId(Long id) {
+        RegistroDePonto registro = registroDePontoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("RegistroDePonto", id));
+        return toResponseDTO(registro);
+    }
 
-        return registroDePontoRepository.findByFuncionarioId(funcionario.getId()).stream() // Variável corrigida
-                .map(this::toResponseDTO)
-                .collect(Collectors.toList());
+    /*
+     * Deleta um registro de ponto por ID.
+     * @param id ID do registro a ser deletado.
+     */
+    public void deletarRegistro(Long id) {
+        // Verifica se existe antes de deletar
+        registroDePontoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("RegistroDePonto", id));
+
+        registroDePontoRepository.deleteById(id);
+    }
+
+
+    /*
+     * @param funcionarioId ID do funcionário.
+     * @param ano O ano de referência.
+     * @param mes O mês de referência (1-12).
+     * @return DTO com o total de horas trabalhadas.
+     */
+    public TotalHorasTrabalhadasDTO calcularHorasTrabalhadasMes(Long funcionarioId, int ano, int mes) {
+        // Verifica se o funcionário existe (reutilizando o serviço)
+        funcionarioService.buscarFuncionarioPorId(funcionarioId); // Lança 404 se não existir
+
+        // Define o período de busca (do primeiro ao último dia do mês)
+        LocalDateTime inicioMes = LocalDateTime.of(ano, mes, 1, 0, 0);
+        LocalDateTime fimMes = inicioMes.withDayOfMonth(inicioMes.toLocalDate().lengthOfMonth())
+                .withHour(23).withMinute(59).withSecond(59);
+
+        // Busca todos os registros de ponto do funcionário dentro do mês/ano
+        List<RegistroDePonto> registros = registroDePontoRepository.findByFuncionarioIdAndDataBetween(
+                funcionarioId, inicioMes.toLocalDate(), fimMes.toLocalDate());
+
+        long totalMinutos = 0;
+
+        // 4. Itera sobre os registros e calcula as horas
+        for (RegistroDePonto registro : registros) {
+            LocalTime entrada = registro.getEntrada();
+            LocalTime saida = registro.getSaida();
+
+            // Só calcula se o registro de ponto estiver completo (com saída)
+            if (entrada != null && saida != null) {
+                // Cria LocalDateTime para calcular a duração, pois Duration não trabalha com LocalTime diretamente
+                // Assume que entrada e saída ocorreram no mesmo dia (registro.getData())
+                LocalDateTime inicio = LocalDateTime.of(registro.getData(), entrada);
+                LocalDateTime fim = LocalDateTime.of(registro.getData(), saida);
+
+                // Garante que o cálculo seja positivo (caso a saída seja antes da entrada, o que deve ser evitado na UI/validação, mas seguro aqui)
+                Duration duracao = Duration.between(inicio, fim).abs();
+                totalMinutos += duracao.toMinutes();
+            }
+        }
+
+        // 5. Formata o resultado para o DTO
+        long horas = totalMinutos / 60;
+        long minutos = totalMinutos % 60;
+
+        return TotalHorasTrabalhadasDTO.builder()
+                .funcionarioId(funcionarioId)
+                .mes(mes)
+                .ano(ano)
+                .totalMinutos(totalMinutos)
+                .totalHoras(String.format("%d:%02dh", horas, minutos)) // Formato H:MMh (Ex: 176:30h)
+                .build();
     }
 }
