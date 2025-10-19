@@ -9,7 +9,7 @@ import lombok.Builder;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-/**
+/*
  * Entidade para o registro diário de ponto de um funcionário.
  */
 @Data
@@ -24,7 +24,9 @@ public class RegistroDePonto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    //Mudança de LAZY para EAGER para evitar o erro "no session"
+    // O EAGER garante que o objeto Funcionario seja carregado junto com o Ponto.
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "funcionario_id", nullable = false)
     private Funcionario funcionario;
 

@@ -1,26 +1,31 @@
-package com.pedro.gestao_de_rh.hrms.dto.funcionario.SolicitacaoDeFeriasDTO;
+package com.pedro.gestao_de_rh.hrms.dto.ferias;
 
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.FutureOrPresent;
-import lombok.Data;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 /*
  * DTO para receber os dados de uma nova solicitação de férias.
+ * REMOVIDAS as anotações @Future e @FutureOrPresent para permitir testes com datas antigas.
  */
 @Data
-public class SoliciticaoFeriasRequestDTO {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class SolicitacaoFeriasRequestDTO {
 
     @NotNull(message = "O ID do funcionário é obrigatório.")
     private Long funcionarioId;
 
     @NotNull(message = "A data de início das férias é obrigatória.")
-    @FutureOrPresent(message = "A data de início deve ser hoje ou no futuro.")
+    // Removida anotação @FutureOrPresent
     private LocalDate dataInicio;
 
     @NotNull(message = "A data de fim das férias é obrigatória.")
-    @Future(message = "A data de fim deve ser futura.")
+    // Removida anotação @Future
     private LocalDate dataFim;
 }

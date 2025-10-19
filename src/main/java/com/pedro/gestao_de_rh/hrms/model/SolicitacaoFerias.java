@@ -37,4 +37,5 @@ public class SolicitacaoFerias {
     @Column(name = "status", nullable = false)
     private StatusFerias status;
 
+
 }

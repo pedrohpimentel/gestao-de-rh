@@ -1,105 +1,148 @@
 package com.pedro.gestao_de_rh.hrms.service;
 
+import com.pedro.gestao_de_rh.hrms.dto.ferias.SolicitacaoFeriasRequestDTO;
+import com.pedro.gestao_de_rh.hrms.dto.ferias.SolicitacaoFeriasResponseDTO;
+import com.pedro.gestao_de_rh.hrms.dto.funcionario.funcionarioDTO.FuncionarioResponseDTO;
 import com.pedro.gestao_de_rh.hrms.enums.StatusFerias;
 import com.pedro.gestao_de_rh.hrms.exception.RecursoNaoEncontradoException;
+import com.pedro.gestao_de_rh.hrms.exception.RegraNegocioException;
 import com.pedro.gestao_de_rh.hrms.model.Funcionario;
 import com.pedro.gestao_de_rh.hrms.model.SolicitacaoFerias;
 import com.pedro.gestao_de_rh.hrms.repository.SolicitacaoFeriasRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /*
- * Camada de serviço responsável pela lógica de negócio das Solicitações de Férias.
- * Usa @RequiredArgsConstructor para realizar Injeção de Dependência via Construtor.
+ * Serviço responsável pela lógica de negócio das Solicitações de Férias.
  */
-
 @Service
 @RequiredArgsConstructor
 public class SolicitacaoFeriasService {
 
-    private final SolicitacaoFeriasRepository solicitacaoFeriasRepository;
+    private final SolicitacaoFeriasRepository feriasRepository;
     private final FuncionarioService funcionarioService;
 
+    // --- MÉTODOS DE CONVERSÃO INTERNOS ---
+
     /*
-      Submete uma nova solicitação de férias para um funcionário.
-      O status inicial é definido como PENDENTE.
-      @param funcionarioId O ID do funcionário solicitante.
-      @param solicitacao O objeto SolicitacaoFerias com dataInicio e dataFim.
-      @return A solicitação de férias salva.
-      @throws RecursoNaoEncontradoException Se o funcionário não for encontrado.
+     * Converte a Entidade Funcionario para um FuncionarioResponseDTO simples.
+     * Necessário para o DTO aninhado.
      */
-
-    public SolicitacaoFerias criarSolicitacao(Long funcionarioId, SolicitacaoFerias solicitacao) {
-        // 1. Busca e valida a existência do funcionário (lançará 404 se não existir.
-        Funcionario funcionario = funcionarioService.buscarFuncionarioPorId(funcionarioId);
-
-        // 2. Define o funcionário na solicitação
-        solicitacao.setFuncionario(funcionario);
-
-        // 3. Define o status inicial
-        solicitacao.setStatus(StatusFerias.PENDENTE);
-
-        // 4. Persiste no banco
-        return solicitacaoFeriasRepository.save(solicitacao);
+    private FuncionarioResponseDTO toFuncionarioResponseDTO(Funcionario funcionario) {
+        return FuncionarioResponseDTO.builder()
+                .id(funcionario.getId())
+                .nome(funcionario.getNome())
+                // Adicione outros campos necessários do FuncionarioResponseDTO se existirem,
+                // como cpf, dataNascimento, etc., que você usa na sua DTO de funcionário.
+                .build();
     }
 
     /*
-     * Busca uma solicitação de férias pelo ID. Lança 404 se não for encontrada.
-     * @param id O ID da solicitação.
-     * @return A solicitação encontrada.
-     * @throws RecursoNaoEncontradoException Se a solicitação não for encontrada.
+     * Converte a Entidade para o DTO de Resposta (USANDO OBJETO ANINHADO).
      */
-    public SolicitacaoFerias buscarSolicitacaoPorId(Long id) {
-        return solicitacaoFeriasRepository.findById(id)
+    private SolicitacaoFeriasResponseDTO toResponseDTO(SolicitacaoFerias solicitacao) {
+        Funcionario funcionarioEntity = solicitacao.getFuncionario();
+        FuncionarioResponseDTO funcionarioDTO = null;
+
+        if (funcionarioEntity != null) {
+            // Converte a entidade Funcionario para o DTO aninhado
+            funcionarioDTO = toFuncionarioResponseDTO(funcionarioEntity);
+        }
+
+        return SolicitacaoFeriasResponseDTO.builder()
+                .id(solicitacao.getId())
+                .dataInicio(solicitacao.getDataInicio())
+                .dataFim(solicitacao.getDateFim())
+                .status(solicitacao.getStatus().name()) // Converte Enum para String
+                .funcionario(funcionarioDTO) // Seta o objeto FuncionarioResponseDTO
+                .build();
+    }
+
+    /*
+     * Converte o DTO de Requisição para a Entidade, definindo o status inicial.
+     */
+    private SolicitacaoFerias toEntity(SolicitacaoFeriasRequestDTO dto, Funcionario funcionario) {
+        return SolicitacaoFerias.builder()
+                .funcionario(funcionario)
+                .dataInicio(dto.getDataInicio())
+                .dateFim(dto.getDataFim())
+                .status(StatusFerias.PENDENTE) // Sempre inicia como PENDENTE
+                .build();
+    }
+
+    // --- LÓGICA DE NEGÓCIO ---
+
+    /*
+     * Método para criar uma nova solicitação de férias.
+     */
+    public SolicitacaoFeriasResponseDTO criarSolicitacao(SolicitacaoFeriasRequestDTO requestDTO) {
+        // 1. Verificar se o funcionário existe
+        // buscarFuncionarioPorId retorna a ENTIDADE Funcionario.
+        Funcionario funcionario = funcionarioService.buscarFuncionarioPorId(requestDTO.getFuncionarioId());
+
+        // 2. Validação da Regra de Negócio: Data de Fim deve ser depois da Data de Início
+        if (requestDTO.getDataFim().isBefore(requestDTO.getDataInicio())) {
+            throw new RegraNegocioException("A data de fim das férias não pode ser anterior à data de início.");
+        }
+
+        // 3. Validação de período (mínimo de 1 dia)
+        long dias = ChronoUnit.DAYS.between(requestDTO.getDataInicio(), requestDTO.getDataFim());
+        if (dias <= 0) {
+            throw new RegraNegocioException("O período de férias deve ter no mínimo 1 dia.");
+        }
+
+        // 4. Conversão e salvamento
+        SolicitacaoFerias solicitacao = toEntity(requestDTO, funcionario);
+        SolicitacaoFerias salvo = feriasRepository.save(solicitacao);
+
+        return toResponseDTO(salvo);
+    }
+
+
+    public List<SolicitacaoFeriasResponseDTO> listarTodas() {
+        return feriasRepository.findAll().stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    public SolicitacaoFeriasResponseDTO buscarPorId(Long id) {
+        SolicitacaoFerias solicitacao = feriasRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Solicitação de Férias", id));
-    }
-
-    /*
-     * Lista todas as solicitações de férias (essencial para a gerência de RH).
-     * @return Uma lista de todas as solicitações.
-     */
-    public List<SolicitacaoFerias> listarSolicitacoes() {
-        return solicitacaoFeriasRepository.findAll();
-    }
-
-    /*
-     * Lista todas as solicitações de férias com status PENDENTE, ordenadas pela data de início.
-     * @return Uma lista de solicitações pendentes.
-     */
-    public List<SolicitacaoFerias> listarSolicitacoesPendentes(){
-        // Usa a Query Method customizada que ordena pela data de início
-        return solicitacaoFeriasRepository.findByStatusOrderByDataInicioAsc(StatusFerias.PENDENTE);
+        return toResponseDTO(solicitacao);
     }
 
     /*
      * Atualiza o status de uma solicitação de férias.
-     * @param id O ID da solicitação.
-     * @param novoStatus O novo status (APROVADA ou REJEITADA).
-     * @return A solicitação atualizada.
+     * @param id ID da solicitação.
+     * @param novoStatusString O novo status a ser aplicado (String).
+     * @return DTO da solicitação atualizada.
      */
-    public SolicitacaoFerias atualizarStatus(Long id, StatusFerias novoStatus) {
-        SolicitacaoFerias solicitacao = buscarSolicitacaoPorId(id); //Valida a existência
+    public SolicitacaoFeriasResponseDTO atualizarStatus(Long id, String novoStatusString) {
+        SolicitacaoFerias solicitacao = feriasRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Solicitação de Férias", id));
 
-        // Regra de Negócio: Garante que o status só pode ser alterado para aprovação ou rejeição
-        if (novoStatus.equals(StatusFerias.PENDENTE)) {
-            throw new IllegalArgumentException("O status não pode ser revertido para PENDENTE via esta operação.");
+        // Converte a String para o Enum StatusFerias, tratando erros de formato.
+        StatusFerias novoStatus;
+        try {
+            novoStatus = StatusFerias.valueOf(novoStatusString.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new RegraNegocioException("Status inválido fornecido: " + novoStatusString + ". Use PENDENTE, APROVADA ou REJEITADA.");
         }
+
+        // Aplica a regra de negócio
         solicitacao.setStatus(novoStatus);
-        return solicitacaoFeriasRepository.save(solicitacao);
+        SolicitacaoFerias atualizada = feriasRepository.save(solicitacao);
+        return toResponseDTO(atualizada);
     }
 
-    /*
-     * Deleta uma solicitação de férias pelo ID.
-     * @param id O ID da solicitação a ser deletada.
-     */
     public void deletarSolicitacao(Long id) {
-        // Verificar se a solicitação existe (reutilizando a lógica de busca)
-        // O método buscarPorId já lança RecursoNaoEncontradoException se o ID não for achado.
-        solicitacaoFeriasRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("SolicitacaoFerias", id));
-        // Se a solicitação existe, deleta
-        solicitacaoFeriasRepository.deleteById(id);
+        // Verifica se a solicitação existe antes de deletar
+        feriasRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Solicitação de Férias", id));
+        feriasRepository.deleteById(id);
     }
 }

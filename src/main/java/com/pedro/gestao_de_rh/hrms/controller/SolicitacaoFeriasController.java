@@ -1,7 +1,9 @@
 package com.pedro.gestao_de_rh.hrms.controller;
 
+import com.pedro.gestao_de_rh.hrms.dto.ferias.FeriasStatusUpdateDTO;
+import com.pedro.gestao_de_rh.hrms.dto.ferias.SolicitacaoFeriasRequestDTO;
+import com.pedro.gestao_de_rh.hrms.dto.ferias.SolicitacaoFeriasResponseDTO;
 import com.pedro.gestao_de_rh.hrms.enums.StatusFerias;
-import com.pedro.gestao_de_rh.hrms.model.SolicitacaoFerias;
 import com.pedro.gestao_de_rh.hrms.service.SolicitacaoFeriasService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +16,7 @@ import java.util.List;
 /*
  * Controller responsável pelos endpoints de gestão de Solicitações de Férias.
  * Usa injeção de dependência via construtor (@RequiredArgsConstructor).
- * Mapeamento base: /api/v1/solicitacoes
+ * Mapeamento base: /ferias
  */
 @RestController
 @RequestMapping("/ferias")
@@ -24,75 +26,60 @@ public class SolicitacaoFeriasController {
     private final SolicitacaoFeriasService solicitacaoFeriasService;
 
     /*
-     * POST /solicitacoes/funcionario/{funcionarioId}
-     * Endpoint para um funcionário submeter uma nova solicitação de férias.
-     * O status inicial é definido como PENDENTE no Service.
-     * Adicionada anotação @Valid.
-     * @param funcionarioId ID do funcionário que está solicitando.
-     * @param solicitacao O corpo da solicitação com dataInicio e dataFim.
-     * @return 201 Created e a solicitação salva.
+     * POST /ferias: Cria uma nova solicitação de férias.
+     * @param requestDTO Dados da solicitação (funcionarioId, dataInicio, dataFim).
+     * @return ResponseEntity com o objeto de férias criado e status 201.
      */
-    @PostMapping("/funcionario/{funcionarioId}")
-    public ResponseEntity<SolicitacaoFerias> criarSolicitacao(
-            @PathVariable Long funcionarioId,
-          @Valid @RequestBody SolicitacaoFerias solicitacao){
-
-        SolicitacaoFerias novaSolicitacao = solicitacaoFeriasService.criarSolicitacao(funcionarioId, solicitacao);
-        return new ResponseEntity<>(novaSolicitacao, HttpStatus.CREATED);
+    @PostMapping
+    public ResponseEntity<SolicitacaoFeriasResponseDTO> solicitarFerias(@RequestBody @Valid SolicitacaoFeriasRequestDTO requestDTO) {
+        SolicitacaoFeriasResponseDTO novaFerias = solicitacaoFeriasService.criarSolicitacao(requestDTO);
+        return new ResponseEntity<>(novaFerias, HttpStatus.CREATED);
     }
 
     /*
-     * GET /solicitacoes
+     * GET /ferias
      * Endpoint de gerência para listar todas as solicitações de férias existentes.
+     * Mapeado para o método 'listarTodas' no Service.
      *
-     * @return 200 OK e a lista de solicitações.
+     * @return 200 OK e a lista de DTOs de solicitação.
      */
     @GetMapping
-    public ResponseEntity<List<SolicitacaoFerias>> listarTodasSolicitacoes(){
-        List<SolicitacaoFerias> solicitacoes = solicitacaoFeriasService.listarSolicitacoes();
+    public ResponseEntity<List<SolicitacaoFeriasResponseDTO>> listarTodasSolicitacoes(){
+        // CORRIGIDO: Chamando o método 'listarTodas' que retorna List<SolicitacaoFeriasResponseDTO>
+        List<SolicitacaoFeriasResponseDTO> solicitacoes = solicitacaoFeriasService.listarTodas();
         return ResponseEntity.ok(solicitacoes);
     }
 
     /*
-     * GET /solicitacoes/pendentes
-     * Endpoint de gerência para listar apenas as solicitações com status PENDENTE.
-     *
-     * @return 200 OK e a lista de solicitações pendentes.
-     */
-    @GetMapping("/pendentes")
-    public ResponseEntity<List<SolicitacaoFerias>> listarSolicitacoesPendentes(){
-        List<SolicitacaoFerias> solicitacoes = solicitacaoFeriasService.listarSolicitacoesPendentes();
-        return ResponseEntity.ok(solicitacoes);
-    }
-
-    /*
-     * GET /solicitacoes/{id}
+     * GET /ferias/{id}
      * Busca uma solicitação específica.
+     * Mapeado para o método 'buscarPorId' no Service.
      *
      * @param id ID da solicitação.
-     * @return 200 OK e a solicitação. Retorna 404 se não for encontrada (graças ao Advice).
+     * @return 200 OK e o DTO da solicitação.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<SolicitacaoFerias> buscarSolicitacaoPorId(@PathVariable Long id){
-        SolicitacaoFerias solicitacao = solicitacaoFeriasService.buscarSolicitacaoPorId(id);
+    public ResponseEntity<SolicitacaoFeriasResponseDTO> buscarSolicitacaoPorId(@PathVariable Long id){
+        // CORRIGIDO: Chamando o método 'buscarPorId' que retorna SolicitaçãoFeriasResponseDTO
+        SolicitacaoFeriasResponseDTO solicitacao = solicitacaoFeriasService.buscarPorId(id);
         return ResponseEntity.ok(solicitacao);
     }
 
     /*
-     * PUT /solicitacoes/{id}/status
+     * PUT /ferias/status/{id}
      * Endpoint de gerência para APROVAR ou REJEITAR uma solicitação de férias.
-     * Espera no corpo da requisição o novo status (ex: "APROVADA" ou "REJEITADA").
-     * Adicionada anotação @Valid.
+     *
      * @param id ID da solicitação a ser atualizada.
      * @param novoStatus O corpo da requisição contendo o novo StatusFerias.
-     * @return 200 OK e a solicitação atualizada.
+     * @return 200 OK e o DTO da solicitação atualizada.
      */
     @PutMapping("/status/{id}")
-    public ResponseEntity<SolicitacaoFerias> atualizarStatus(
+    public ResponseEntity<SolicitacaoFeriasResponseDTO> atualizarStatus(
             @PathVariable Long id,
-           @Valid @RequestBody StatusFerias novoStatus) { //O Spring converte o valor de body para enum
+            @Valid @RequestBody FeriasStatusUpdateDTO updateDTO) { // Usa o novo DTO
 
-        SolicitacaoFerias solicitacaoAtualizada = solicitacaoFeriasService.atualizarStatus(id,novoStatus);
+        // Chamando o service com o valor String
+        SolicitacaoFeriasResponseDTO solicitacaoAtualizada = solicitacaoFeriasService.atualizarStatus(id, updateDTO.getNovoStatus());
         return ResponseEntity.ok(solicitacaoAtualizada);
     }
 

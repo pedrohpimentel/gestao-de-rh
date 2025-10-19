@@ -1,4 +1,4 @@
-package com.pedro.gestao_de_rh.hrms.dto.funcionario.SolicitacaoDeFeriasDTO;
+package com.pedro.gestao_de_rh.hrms.dto.ferias;
 
 import com.pedro.gestao_de_rh.hrms.dto.funcionario.funcionarioDTO.FuncionarioResponseDTO;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.time.LocalDate;
  */
 @Data
 @Builder
-public class SoliciticaoFeriasResponseDTO {
+public class SolicitacaoFeriasResponseDTO {
     private Long id;
     private LocalDate dataInicio;
     private LocalDate dataFim;
