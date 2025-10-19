@@ -3,6 +3,7 @@ package com.pedro.gestao_de_rh.hrms.controller;
 import com.pedro.gestao_de_rh.hrms.dto.funcionario.RegistroDePontoRequestDTO;
 import com.pedro.gestao_de_rh.hrms.dto.funcionario.RegistroDePontoResponseDTO;
 import com.pedro.gestao_de_rh.hrms.service.RegistroDePontoService; // Importação corrigida
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +25,12 @@ public class RegistroDePontoController {
     /*
      * POST /pontos
      * Registra um novo ponto.
+     * Adicionada anotação @Valid.
      * @param requestDTO Dados do ponto a ser registrado.
      * @return 201 Created e o ponto registrado (ResponseDTO).
      */
     @PostMapping
-    public ResponseEntity<RegistroDePontoResponseDTO> registrarPonto(@RequestBody RegistroDePontoRequestDTO requestDTO) {
+    public ResponseEntity<RegistroDePontoResponseDTO> registrarPonto(@Valid @RequestBody RegistroDePontoRequestDTO requestDTO) {
         RegistroDePontoResponseDTO responseDTO = registroDePontoService.registrarPonto(requestDTO);
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }

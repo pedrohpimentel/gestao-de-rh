@@ -3,6 +3,7 @@ package com.pedro.gestao_de_rh.hrms.controller;
 import com.pedro.gestao_de_rh.hrms.enums.StatusFerias;
 import com.pedro.gestao_de_rh.hrms.model.SolicitacaoFerias;
 import com.pedro.gestao_de_rh.hrms.service.SolicitacaoFeriasService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class SolicitacaoFeriasController {
      * POST /solicitacoes/funcionario/{funcionarioId}
      * Endpoint para um funcionário submeter uma nova solicitação de férias.
      * O status inicial é definido como PENDENTE no Service.
-
+     * Adicionada anotação @Valid.
      * @param funcionarioId ID do funcionário que está solicitando.
      * @param solicitacao O corpo da solicitação com dataInicio e dataFim.
      * @return 201 Created e a solicitação salva.
@@ -34,7 +35,7 @@ public class SolicitacaoFeriasController {
     @PostMapping("/funcionario/{funcionarioId}")
     public ResponseEntity<SolicitacaoFerias> criarSolicitacao(
             @PathVariable Long funcionarioId,
-            @RequestBody SolicitacaoFerias solicitacao){
+          @Valid @RequestBody SolicitacaoFerias solicitacao){
 
         SolicitacaoFerias novaSolicitacao = solicitacaoFeriasService.criarSolicitacao(funcionarioId, solicitacao);
         return new ResponseEntity<>(novaSolicitacao, HttpStatus.CREATED);
@@ -81,7 +82,7 @@ public class SolicitacaoFeriasController {
      * PUT /solicitacoes/{id}/status
      * Endpoint de gerência para APROVAR ou REJEITAR uma solicitação de férias.
      * Espera no corpo da requisição o novo status (ex: "APROVADA" ou "REJEITADA").
-     *
+     * Adicionada anotação @Valid.
      * @param id ID da solicitação a ser atualizada.
      * @param novoStatus O corpo da requisição contendo o novo StatusFerias.
      * @return 200 OK e a solicitação atualizada.
@@ -89,9 +90,15 @@ public class SolicitacaoFeriasController {
     @PutMapping("/{id/status}")
     public ResponseEntity<SolicitacaoFerias> atualizarStatus(
             @PathVariable Long id,
-            @RequestBody StatusFerias novoStatus) { //O Spring converte o valor de body para enum
+           @Valid @RequestBody StatusFerias novoStatus) { //O Spring converte o valor de body para enum
 
         SolicitacaoFerias solicitacaoAtualizada = solicitacaoFeriasService.atualizarStatus(id,novoStatus);
         return ResponseEntity.ok(solicitacaoAtualizada);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarSolicitacao(@PathVariable Long id) {
+        solicitacaoFeriasService.deletarSolicitacao(id);
+        return ResponseEntity.noContent().build();
     }
 }

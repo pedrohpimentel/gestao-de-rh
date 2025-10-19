@@ -89,4 +89,17 @@ public class SolicitacaoFeriasService {
         solicitacao.setStatus(novoStatus);
         return solicitacaoFeriasRepository.save(solicitacao);
     }
+
+    /*
+     * Deleta uma solicitação de férias pelo ID.
+     * @param id O ID da solicitação a ser deletada.
+     */
+    public void deletarSolicitacao(Long id) {
+        // Verificar se a solicitação existe (reutilizando a lógica de busca)
+        // O método buscarPorId já lança RecursoNaoEncontradoException se o ID não for achado.
+        solicitacaoFeriasRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("SolicitacaoFerias", id));
+        // Se a solicitação existe, deleta
+        solicitacaoFeriasRepository.deleteById(id);
+    }
 }

@@ -3,6 +3,7 @@ package com.pedro.gestao_de_rh.hrms.controller;
 import com.pedro.gestao_de_rh.hrms.dto.funcionario.FuncionarioRequestDTO;
 import com.pedro.gestao_de_rh.hrms.dto.funcionario.FuncionarioResponseDTO;
 import com.pedro.gestao_de_rh.hrms.service.FuncionarioService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +25,12 @@ public class FuncionarioController {
     /*
      * POST /funcionarios
      * Cria um novo funcionário.
+     * Adicionada anotação @Valid.
      * @param requestDTO Dados do novo funcionário.
      * @return 201 Created e o funcionário criado (ResponseDTO).
      */
     @PostMapping
-    public ResponseEntity<FuncionarioResponseDTO> criarFuncionario(@RequestBody FuncionarioRequestDTO requestDTO) {
+    public ResponseEntity<FuncionarioResponseDTO> criarFuncionario(@Valid @RequestBody FuncionarioRequestDTO requestDTO) {
         FuncionarioResponseDTO responseDTO = funcionarioService.criarFuncionario(requestDTO);
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
@@ -59,6 +61,7 @@ public class FuncionarioController {
     /*
      * PUT /funcionarios/{id}
      * Atualiza os dados de um funcionário existente.
+     * Adicionada anotação @Valid.
      * @param id ID do funcionário a ser atualizado.
      * @param requestDTO Dados atualizados.
      * @return 200 OK e o funcionário atualizado (ResponseDTO).
@@ -66,7 +69,7 @@ public class FuncionarioController {
     @PutMapping("/{id}")
     public ResponseEntity<FuncionarioResponseDTO> atualizarFuncionario(
             @PathVariable Long id,
-            @RequestBody FuncionarioRequestDTO requestDTO) {
+           @Valid @RequestBody FuncionarioRequestDTO requestDTO) {
 
         FuncionarioResponseDTO responseDTO = funcionarioService.atualizarFuncionario(id, requestDTO);
         return ResponseEntity.ok(responseDTO);

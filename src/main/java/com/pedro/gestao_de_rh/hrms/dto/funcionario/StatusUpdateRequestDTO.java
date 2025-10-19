@@ -1,5 +1,6 @@
 package com.pedro.gestao_de_rh.hrms.dto.funcionario;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /*
@@ -7,5 +8,7 @@ import lombok.Data;
  */
 @Data
 public class StatusUpdateRequestDTO {
+
+    @NotBlank(message = "O novo status (APROVADA, REJEITADA, PENDENTE) é obrigatório.")
     private String novoStatus;
 }
