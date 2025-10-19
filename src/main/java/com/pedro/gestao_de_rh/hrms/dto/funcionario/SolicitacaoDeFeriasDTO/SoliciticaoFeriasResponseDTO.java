@@ -1,5 +1,6 @@
-package com.pedro.gestao_de_rh.hrms.dto.funcionario;
+package com.pedro.gestao_de_rh.hrms.dto.funcionario.SolicitacaoDeFeriasDTO;
 
+import com.pedro.gestao_de_rh.hrms.dto.funcionario.funcionarioDTO.FuncionarioResponseDTO;
 import lombok.Builder;
 import lombok.Data;
 

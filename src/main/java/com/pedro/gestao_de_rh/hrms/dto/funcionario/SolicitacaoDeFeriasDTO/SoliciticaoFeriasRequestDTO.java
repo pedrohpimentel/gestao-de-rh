@@ -1,4 +1,4 @@
-package com.pedro.gestao_de_rh.hrms.dto.funcionario;
+package com.pedro.gestao_de_rh.hrms.dto.funcionario.SolicitacaoDeFeriasDTO;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.FutureOrPresent;

@@ -1,6 +1,6 @@
-package com.pedro.gestao_de_rh.hrms.dto.funcionario;
+package com.pedro.gestao_de_rh.hrms.dto.funcionario.RegistroDePontoDTO;
 
-import com.pedro.gestao_de_rh.hrms.dto.funcionario.FuncionarioResponseDTO;
+import com.pedro.gestao_de_rh.hrms.dto.funcionario.funcionarioDTO.FuncionarioResponseDTO;
 import lombok.Builder;
 import lombok.Data;
 import java.time.LocalDate;

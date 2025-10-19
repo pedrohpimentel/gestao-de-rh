@@ -1,7 +1,7 @@
 package com.pedro.gestao_de_rh.hrms.controller;
 
-import com.pedro.gestao_de_rh.hrms.dto.funcionario.RegistroDePontoRequestDTO;
-import com.pedro.gestao_de_rh.hrms.dto.funcionario.RegistroDePontoResponseDTO;
+import com.pedro.gestao_de_rh.hrms.dto.funcionario.RegistroDePontoDTO.RegistroDePontoRequestDTO;
+import com.pedro.gestao_de_rh.hrms.dto.funcionario.RegistroDePontoDTO.RegistroDePontoResponseDTO;
 import com.pedro.gestao_de_rh.hrms.dto.ponto.TotalHorasTrabalhadasDTO;
 import com.pedro.gestao_de_rh.hrms.service.RegistroDePontoService;
 import jakarta.validation.Valid;

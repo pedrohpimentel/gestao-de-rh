@@ -1,4 +1,4 @@
-package com.pedro.gestao_de_rh.hrms.dto.funcionario;
+package com.pedro.gestao_de_rh.hrms.dto.funcionario.StatusUpdateRequestDTO;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

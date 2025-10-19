@@ -1,9 +1,8 @@
-package com.pedro.gestao_de_rh.hrms.dto.funcionario;
+package com.pedro.gestao_de_rh.hrms.dto.funcionario.funcionarioDTO;
 
 import lombok.Builder;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /*

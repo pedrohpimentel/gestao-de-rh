@@ -1,7 +1,7 @@
 package com.pedro.gestao_de_rh.hrms.service;
 
-import com.pedro.gestao_de_rh.hrms.dto.funcionario.FuncionarioRequestDTO;
-import com.pedro.gestao_de_rh.hrms.dto.funcionario.FuncionarioResponseDTO;
+import com.pedro.gestao_de_rh.hrms.dto.funcionario.funcionarioDTO.FuncionarioRequestDTO;
+import com.pedro.gestao_de_rh.hrms.dto.funcionario.funcionarioDTO.FuncionarioResponseDTO;
 import com.pedro.gestao_de_rh.hrms.exception.RecursoNaoEncontradoException;
 import com.pedro.gestao_de_rh.hrms.model.Funcionario;
 import com.pedro.gestao_de_rh.hrms.repository.FuncionarioRepository;

@@ -1,7 +1,7 @@
 package com.pedro.gestao_de_rh.hrms.controller;
 
-import com.pedro.gestao_de_rh.hrms.dto.funcionario.FuncionarioRequestDTO;
-import com.pedro.gestao_de_rh.hrms.dto.funcionario.FuncionarioResponseDTO;
+import com.pedro.gestao_de_rh.hrms.dto.funcionario.funcionarioDTO.FuncionarioRequestDTO;
+import com.pedro.gestao_de_rh.hrms.dto.funcionario.funcionarioDTO.FuncionarioResponseDTO;
 import com.pedro.gestao_de_rh.hrms.service.FuncionarioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
