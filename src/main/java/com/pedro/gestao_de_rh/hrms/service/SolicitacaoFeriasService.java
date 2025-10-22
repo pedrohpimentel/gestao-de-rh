@@ -1,7 +1,7 @@
 package com.pedro.gestao_de_rh.hrms.service;
 
-import com.pedro.gestao_de_rh.hrms.dto.ferias.SolicitacaoFeriasRequestDTO;
-import com.pedro.gestao_de_rh.hrms.dto.ferias.SolicitacaoFeriasResponseDTO;
+import com.pedro.gestao_de_rh.hrms.dto.funcionario.SolicitacaoDeFeriasDTO.SolicitacaoFeriasRequestDTO;
+import com.pedro.gestao_de_rh.hrms.dto.funcionario.SolicitacaoDeFeriasDTO.SolicitacaoFeriasResponseDTO;
 import com.pedro.gestao_de_rh.hrms.dto.funcionario.funcionarioDTO.FuncionarioResponseDTO;
 import com.pedro.gestao_de_rh.hrms.enums.StatusFerias;
 import com.pedro.gestao_de_rh.hrms.exception.RecursoNaoEncontradoException;

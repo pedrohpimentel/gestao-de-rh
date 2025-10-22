@@ -1,9 +1,8 @@
 package com.pedro.gestao_de_rh.hrms.controller;
 
 import com.pedro.gestao_de_rh.hrms.dto.ferias.FeriasStatusUpdateDTO;
-import com.pedro.gestao_de_rh.hrms.dto.ferias.SolicitacaoFeriasRequestDTO;
-import com.pedro.gestao_de_rh.hrms.dto.ferias.SolicitacaoFeriasResponseDTO;
-import com.pedro.gestao_de_rh.hrms.enums.StatusFerias;
+import com.pedro.gestao_de_rh.hrms.dto.funcionario.SolicitacaoDeFeriasDTO.SolicitacaoFeriasRequestDTO;
+import com.pedro.gestao_de_rh.hrms.dto.funcionario.SolicitacaoDeFeriasDTO.SolicitacaoFeriasResponseDTO;
 import com.pedro.gestao_de_rh.hrms.service.SolicitacaoFeriasService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

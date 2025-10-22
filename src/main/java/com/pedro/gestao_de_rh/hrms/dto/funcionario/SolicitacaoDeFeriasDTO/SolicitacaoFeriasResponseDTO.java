@@ -1,4 +1,4 @@
-package com.pedro.gestao_de_rh.hrms.dto.ferias;
+package com.pedro.gestao_de_rh.hrms.dto.funcionario.SolicitacaoDeFeriasDTO;
 
 import com.pedro.gestao_de_rh.hrms.dto.funcionario.funcionarioDTO.FuncionarioResponseDTO;
 import lombok.Builder;

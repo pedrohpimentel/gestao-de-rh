@@ -1,14 +1,10 @@
 package com.pedro.gestao_de_rh.hrms.dto.funcionario.funcionarioDTO;
 
-
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-
-
 
 import java.time.LocalDate;
 

@@ -37,7 +37,7 @@ public class FuncionarioController {
     }
 
     /*
-     * GET /funcionarios
+     * GET /api/v1/funcionarios
      * Lista todos os funcionários.
      * @return 200 OK e a lista de funcionários (ResponseDTO).
      */
@@ -48,7 +48,7 @@ public class FuncionarioController {
     }
 
     /*
-     * GET /funcionarios/{id}
+     * GET /api/v1/funcionarios/{id}
      * Busca um funcionário pelo ID.
      * Implementado try-catch para garantir o 404 localmente, contornando falha do Global Handler.
      * @param id ID do funcionário.

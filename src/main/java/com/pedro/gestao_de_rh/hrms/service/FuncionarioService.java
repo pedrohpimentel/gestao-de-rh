@@ -106,8 +106,11 @@ public class FuncionarioService {
      * Deleta um funcionário pelo ID.
      */
     public void deletarFuncionario(Long id) {
-        // Garante que o recurso existe antes de deletar
-        buscarFuncionarioPorId(id);
-        funcionarioRepository.deleteById(id);
+        // 1. Busca o funcionário (para garantir que ele exista, senão lança a exceção 404)
+        Funcionario funcionario = funcionarioRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Funcionário não encontrado com ID: " + id));
+
+        // 2. Chama a função de deleção. O CASCADE fará o resto!
+        funcionarioRepository.delete(funcionario);
     }
 }

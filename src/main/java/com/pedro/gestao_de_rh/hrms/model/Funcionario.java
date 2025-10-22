@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Entity
@@ -17,6 +18,9 @@ public class Funcionario {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToMany(mappedBy = "funcionario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RegistroDePonto> registrosPonto;
 
     @Column(nullable = false)
     private String nome;
